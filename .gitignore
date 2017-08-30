@@ -282,7 +282,11 @@ Training
 Shop
 Blog
 <<<<<<< HEAD
+<<<<<<< HEAD
 About
 =======
 About
 >>>>>>> 781de36... Initial Commit
+=======
+Aboutsrc/credentials.json
+>>>>>>> 76483e4... Add credentials.json to .gitignore
