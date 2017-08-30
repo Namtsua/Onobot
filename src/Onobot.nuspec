@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Onobot</id>
+    <version>1.0.0$suffix$</version>
+    <title>Onobot</title>
+    <authors>Namtsua</authors>
+    <owners>Namtsua</owners>
+    <description>Discord bot created for the UBC Discord server.</description>
+    <tags>ono;bot;onobot;discord bot</tags>
+    <projectUrl>https://github.com/Namtsua/Onobot</projectUrl>
+    <licenseUrl>https://choosealicense.com/licenses/unlicense/</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+  </metadata>
+</package>
