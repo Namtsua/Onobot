@@ -1,73 +1,60 @@
-﻿using Discord;
-using Discord.WebSocket;
-using Discord.Commands;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
-using System.Reflection;
-public class Program
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+using DiscordBot.Services;
+
+namespace DiscordBot
 {
-
-
-    private CommandService commands;
-    private DiscordSocketClient client;
-    private IServiceProvider services;
-    public static void Main(string[] args)
-        => new Program().MainAsync().GetAwaiter().GetResult();
-
-    public async Task MainAsync()
+    class Program
     {
-        client = new DiscordSocketClient();
-        client.Log += Log;
-        commands = new CommandService();
-        
-        string token = "secret";
+        static void Main(string[] args)
+            => new Program().MainAsync().GetAwaiter().GetResult();
 
-        services = new ServiceCollection().BuildServiceProvider();
+        private DiscordSocketClient _client;
+        private IConfiguration _config;
 
+        public async Task MainAsync()
+        {
+            _client = new DiscordSocketClient();
+            _config = BuildConfig();
 
-        await InstallCommandsAsync();
+            var services = ConfigureServices();
+            services.GetRequiredService<LogService>();
+            await services.GetRequiredService<CommandHandlingService>().InitializeAsync(services);
 
-        await client.LoginAsync(TokenType.Bot, token);
-        await client.StartAsync();
+            await _client.LoginAsync(TokenType.Bot, _config["token"]);
+            await _client.StartAsync();
 
-        // Block until program is closed.
-        await Task.Delay(-1);
-    }
+            await Task.Delay(-1);
+        }
 
-    public async Task InstallCommandsAsync()
-    {
-        client.MessageReceived += HandleCommand;
+        private IServiceProvider ConfigureServices()
+        {
+            return new ServiceCollection()
+                // Base
+                .AddSingleton(_client)
+                .AddSingleton<CommandService>()
+                .AddSingleton<CommandHandlingService>()
+                // Logging
+                .AddLogging()
+                .AddSingleton<LogService>()
+                // Extra
+                .AddSingleton(_config)
+                // Add additional services here...
+                .BuildServiceProvider();
+        }
 
-        await commands.AddModulesAsync(Assembly.GetEntryAssembly());
-    }
-
-    public async Task HandleCommand(SocketMessage messageParam)
-    {
-        var message = messageParam as SocketUserMessage;
-        if (message == null) return;
-
-        int argPos = 0;
-        if (!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(client.CurrentUser, ref argPos))) return;
-        // Create a Command Context
-        var context = new CommandContext(client, message);
-        // Execute the command. (result does not indicate a return value, 
-        // rather an object stating if the command executed successfully)
-        var result = await commands.ExecuteAsync(context, argPos, services);
-        if (!result.IsSuccess)
-            await context.Channel.SendMessageAsync(result.ErrorReason);
-    }
-    // private async Task MessageReceived(SocketMessage message)
-    // {
-    //     if (message.Content == "!ping")
-    //     {
-    //         await message.Channel.SendMessageAsync("Pong!");
-    //     }
-    // }
-
-    private Task Log(LogMessage message)
-    {
-        Console.WriteLine(message.ToString());
-        return Task.CompletedTask;
+        private IConfiguration BuildConfig()
+        {
+            return new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("src/config.json")
+                .Build();
+        }
     }
 }
