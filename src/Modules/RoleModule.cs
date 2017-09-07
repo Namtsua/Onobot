@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
+using System.Collections;
 using Discord.Commands;
 using Discord.WebSocket;
+using Discord.Net;
 
 namespace DiscordBot.Modules
 {
@@ -16,9 +18,13 @@ namespace DiscordBot.Modules
                     $"Sorry {Context.Message.Author.Mention}, you'll need to enter \"!year\" and a number from 1 to 7 corresponding to your standing (or 0 for Alumni)."
                 );
                 return;
+                
             }
-            
-            await YearAsync(Context.Message.Author, year);
+            var user = Context.User;
+            var guild = Context.Guild;
+            var role = guild.GetRole(282382712642338817);
+
+            await YearAsync((user as Discord.IGuildUser), role, year);
         }
         //public Task Year()
          //   => ReplyAsync(
@@ -35,10 +41,10 @@ namespace DiscordBot.Modules
                 //$"Hello, I am a bot called <@{Context.Message.Author.Id}> written in Discord.Net 1.0\n");
                 $"Hey {Context.Message.Author.Mention}, check out my Youtube channel! https://www.youtube.com/channel/UC8KGT0uZ19f6XJPUwxlvzPQ");
     
-        private async Task YearAsync(SocketUser user, string year)
+        private async Task YearAsync(Discord.IGuildUser user, SocketRole role, string year)
         {
             int tag = int.Parse(year);
-            string tagName;
+            string tagName = "";
             switch(tag)
             {
                 case 0: tagName = "Alumni"; break;
@@ -52,9 +58,20 @@ namespace DiscordBot.Modules
                 default: break;
             }
 
-           // await AddRolesAsync()
-
+            await user.AddRoleAsync(role);
+            // ulong asdf = 355223193700794369;
+            // SocketRole fff = Context.Guild.GetRole(asdf);
+            // await ReplyAsync("asdf");
+          //  await user.AddRoleAsync();
+          //  await user.AddRoleAsync()
+            //await ReplyAsync($"aqqq {asdf.Id}");
+            // if (user.GuildId != "")
+            // {
+            //     return;
+            // }
+            // await user.AddRoleAsync();
+            // return;
             
-        }
+        }    
     }
 }
