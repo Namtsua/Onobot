@@ -27,7 +27,7 @@ namespace DiscordBot
             services.GetRequiredService<LogService>();
             await services.GetRequiredService<CommandHandlingService>().InitializeAsync(services);
 
-            await _client.LoginAsync(TokenType.Bot, "MzU0ODc4MTcwMTgyMzIwMTI5.DJHXRw.rZbuYCQGMPApIXGiT4qsyzs6Ax8");
+            await _client.LoginAsync(TokenType.Bot, _config["token"]);
             await _client.StartAsync();
 
             await Task.Delay(-1);
