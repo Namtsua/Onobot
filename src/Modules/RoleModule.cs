@@ -1,16 +1,10 @@
 using System;
-<<<<<<< HEAD
-using System.Threading.Tasks;
-using System.Linq;
-using System.Collections;
-=======
 using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
->>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -20,10 +14,7 @@ namespace DiscordBot.Modules
 {
     public class RoleModule : ModuleBase<SocketCommandContext>
     {
-<<<<<<< HEAD
-=======
         private IConfiguration _messages;
->>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
     
         [Command("year")]
         public async Task Year(string year = "")
@@ -36,11 +27,8 @@ namespace DiscordBot.Modules
                 return;
                 
             }
-<<<<<<< HEAD
-=======
 
             _messages = BuildMessages();
->>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
             var user = Context.User;
             var guild = Context.Guild;
             await YearAsync((user as IGuildUser), guild, year);
@@ -63,11 +51,8 @@ namespace DiscordBot.Modules
                 return;
                 
             }
-<<<<<<< HEAD
-=======
 
             _messages = BuildMessages();
->>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
             var user = Context.User;
             var guild = Context.Guild;
             await ProgramAsync((user as IGuildUser), guild, program);
@@ -76,8 +61,6 @@ namespace DiscordBot.Modules
            => ReplyAsync(
                $"Hi <@{Context.Message.Author.Id}>, let's assign you a Program! What year are you in? \n(Type 0 for Alumni or a number from 1 to 7 corresponding to your standing)");
 
-<<<<<<< HEAD
-=======
 
         [Command("upgrade")]
         public async Task Upgrade()
@@ -126,7 +109,6 @@ namespace DiscordBot.Modules
         }
 
 
->>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
         [Command("help")]
         public Task Help()
             => ReplyAsync(
@@ -138,22 +120,6 @@ namespace DiscordBot.Modules
                 //$"Hello, I am a bot called <@{Context.Message.Author.Id}> written in Discord.Net 1.0\n");
                 $"Hey {Context.Message.Author.Mention}, check out my Youtube channel! https://www.youtube.com/channel/UC8KGT0uZ19f6XJPUwxlvzPQ");
     
-<<<<<<< HEAD
-        private async Task YearAsync(Discord.IGuildUser user, SocketGuild guild, string year)
-        {
-            int tag = int.Parse(year);
-            string tagName = "Barista";
-            switch(tag)
-            {
-                case 0: tagName = "Alumni"; break;
-                case 1: tagName = "First Year"; break;
-                case 2: tagName = "Second Year"; break;
-                case 3: tagName = "Third Year"; break;
-                case 4: tagName = "Fourth Year"; break;
-                case 5: tagName = "Fifth Year"; break;
-                case 6: tagName = "Sixth Year"; break;
-                case 7: tagName = "Seventh Year"; break;
-=======
         private async Task YearAsync(IGuildUser user, SocketGuild guild, string year)
         {
             int tag = int.Parse(year);
@@ -168,7 +134,6 @@ namespace DiscordBot.Modules
                 case 5: tagName = "5th year"; break;
                 case 6: tagName = "6th year"; break;
                 case 7: tagName = "7th year"; break;
->>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
                 default: break;
             }   
             string customMessage = findYearMessage(tag);
@@ -178,17 +143,10 @@ namespace DiscordBot.Modules
             return;
             
        }   
-<<<<<<< HEAD
-       private async Task ProgramAsync(Discord.IGuildUser user, SocketGuild guild, string program)
-        {
-            int tag = int.Parse(program);
-            string tagName = "Barista";
-=======
        private async Task ProgramAsync(IGuildUser user, SocketGuild guild, string program)
         {
             int tag = int.Parse(program);
             string tagName = "";
->>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
             switch(tag)
             {
                 case 1: tagName = "Arts"; break;
@@ -227,29 +185,16 @@ namespace DiscordBot.Modules
             => 
                 ReplyAsync(message);
 
-<<<<<<< HEAD
-=======
         private async Task UpgradeAsync(IGuildUser user, IRole currentRole, IRole nextRole)
         {
             await user.AddRoleAsync(nextRole);
             await user.RemoveRoleAsync(currentRole);
         }
->>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
         private string findYearMessage(int year)
         {
             string customMessage = "";
             switch(year)
             {
-<<<<<<< HEAD
-                case 0: customMessage = "What are you doing here? Just kidding, anyone UBC-related is welcome."; break;
-                case 1: customMessage = "Welcome to UBC! I hope you are enjoying your first year."; break;
-                case 2: customMessage = "Thanks. How about them late registration dates, eh?"; break;
-                case 3: customMessage = "Thanks. Congratulations on surviving your first two years!"; break;
-                case 4: customMessage = "Thanks. I hope you're enjoying those sweet early registration dates."; break;
-                case 5: customMessage = "Thanks. I hope your half decade at UBC has been great!"; break;
-                case 6: customMessage = "Thanks. Going for the long haul, eh?"; break;
-                case 7: customMessage = "Thanks. I see you can't get enough of UBC, but you can't stay forever!"; break;
-=======
                 case 0: customMessage = _messages["Alumni"]; break;
                 case 1: customMessage = _messages["1st year"]; break;
                 case 2: customMessage = _messages["2nd year"]; break;
@@ -258,7 +203,6 @@ namespace DiscordBot.Modules
                 case 5: customMessage = _messages["5th year"]; break;
                 case 6: customMessage = _messages["6th year"]; break;
                 case 7: customMessage = _messages["7th year"]; break;
->>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
                 default: break;
             }
             return customMessage;
@@ -268,34 +212,6 @@ namespace DiscordBot.Modules
             string customMessage = "";
             switch(program)
             {
-<<<<<<< HEAD
-                case 1: customMessage = "Arts, eh? Tired of writing essays yet?"; break;
-                case 2: customMessage = "Architecture, eh? Planning on becoming the next Indiana Jones?"; break;
-                case 3: customMessage = "Biopsychology, eh? That's oddly specific."; break;
-                case 4: customMessage = "Biotechnology, eh? Enjoy your trips to BCIT."; break;
-                case 5: customMessage = "Computer Science, eh? Remember to trust the natural recursion!"; break;
-                case 6: customMessage = "Engineering, eh? We get it. You think your program is hard."; break;
-                case 7: customMessage = "Forestry, eh? Stop dressing like you're about to go on a camping trip."; break;
-                case 8: customMessage = "Integrated Sciences, eh? You already know what I'm going to say."; break;
-                case 9: customMessage = "Kinesiology, eh? I'm down for some massages anytime."; break;
-                case 10: customMessage = "LFS, eh? Is that actually a faculty?"; break;
-                case 11: customMessage = "Music, eh? Are you the type to play Wonderwall at a house party?"; break;
-                case 12: customMessage = "Pharmacology, eh? Did you mean to pursue Pharmacy? Mistakes happen."; break;
-                case 13: customMessage = "Pharmacy, eh? If you need anyone to test some hallucinogenics, let me know!"; break;
-                case 14: customMessage = "Physics & Astronomy, eh? Have you gotten tired of Hennings yet?"; break;
-                case 15: customMessage = "Political Science, eh? Is this just a stepping stone towards law school?"; break;
-                case 16: customMessage = "Sauder, eh? Don't even talk to me about your startup proposal."; break;
-                case 17: customMessage = "Science, eh? Sorry there's no pre-med option!"; break;
-                case 18: customMessage = "Statistics, eh? Don't lie, you've probably taken more Computer Science courses than Statistics ones."; break;
-                case 19: customMessage = "VISA, eh? Feel free to paint me whenever!"; break;
-                case 20: customMessage = "Langara Student, eh? One of these days, you won't get off the 49 at Cambie."; break;
-                case 21: customMessage = "UVIC/SFU Spy, eh? It takes guts to confess this, I'll let you live."; break;
-                case 22: customMessage = "High School Student, eh? Feel free to ask questions, don't expect fantastic answers."; break;
-                default: break;
-            }
-            return customMessage;
-        }
-=======
                 case 1: customMessage = _messages["Arts"]; break;
                 case 2: customMessage = _messages["Architecture"]; break;
                 case 3: customMessage = _messages["Biopsychology"]; break;
@@ -331,6 +247,5 @@ namespace DiscordBot.Modules
                 .AddJsonFile("src/messages.json")
                 .Build();
         }
->>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
     }
 }
