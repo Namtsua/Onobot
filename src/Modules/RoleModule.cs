@@ -1,7 +1,16 @@
 using System;
+<<<<<<< HEAD
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections;
+=======
+using System.IO;
+using System.Threading.Tasks;
+using System.Linq;
+using System.Collections;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+>>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -11,6 +20,10 @@ namespace DiscordBot.Modules
 {
     public class RoleModule : ModuleBase<SocketCommandContext>
     {
+<<<<<<< HEAD
+=======
+        private IConfiguration _messages;
+>>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
     
         [Command("year")]
         public async Task Year(string year = "")
@@ -23,6 +36,11 @@ namespace DiscordBot.Modules
                 return;
                 
             }
+<<<<<<< HEAD
+=======
+
+            _messages = BuildMessages();
+>>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
             var user = Context.User;
             var guild = Context.Guild;
             await YearAsync((user as IGuildUser), guild, year);
@@ -45,6 +63,11 @@ namespace DiscordBot.Modules
                 return;
                 
             }
+<<<<<<< HEAD
+=======
+
+            _messages = BuildMessages();
+>>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
             var user = Context.User;
             var guild = Context.Guild;
             await ProgramAsync((user as IGuildUser), guild, program);
@@ -53,6 +76,57 @@ namespace DiscordBot.Modules
            => ReplyAsync(
                $"Hi <@{Context.Message.Author.Id}>, let's assign you a Program! What year are you in? \n(Type 0 for Alumni or a number from 1 to 7 corresponding to your standing)");
 
+<<<<<<< HEAD
+=======
+
+        [Command("upgrade")]
+        public async Task Upgrade()
+        {
+            var user = Context.User as SocketGuildUser;
+            var roles = (user as IGuildUser).Guild.Roles;
+            var firstYear = roles.FirstOrDefault(x => x.Name == "1st year");
+            var secondYear = roles.FirstOrDefault(x => x.Name == "2nd year");
+            var thirdYear = roles.FirstOrDefault(x => x.Name == "3rd year");
+            var fourthYear = roles.FirstOrDefault(x => x.Name == "4th year");
+            var fifthYear = roles.FirstOrDefault(x => x.Name == "5th year");
+            var sixthYear = roles.FirstOrDefault(x => x.Name == "6th year");
+            var seventhYear = roles.FirstOrDefault(x => x.Name == "7th year");
+            var alumni = roles.FirstOrDefault(x => x.Name == "Alumni");
+            
+            if (user.Roles.Contains(firstYear))
+            {
+                await UpgradeAsync(user,firstYear,secondYear);
+            }
+            else if (user.Roles.Contains(secondYear))
+            {
+                await UpgradeAsync(user,secondYear,thirdYear);
+            }
+            else if (user.Roles.Contains(thirdYear))
+            {
+                await UpgradeAsync(user,thirdYear,fourthYear);
+            }
+            else if (user.Roles.Contains(fourthYear))
+            {
+               await UpgradeAsync(user,fourthYear,fifthYear);
+            }
+            else if (user.Roles.Contains(fifthYear))
+            {
+               await UpgradeAsync(user,fifthYear,sixthYear);
+            }
+            else if (user.Roles.Contains(sixthYear))
+            {
+               await UpgradeAsync(user,sixthYear,seventhYear);
+            }
+            else if (user.Roles.Contains(seventhYear))
+            {
+               await UpgradeAsync(user,seventhYear,alumni);
+            }
+
+            await ReplyAsync("You've been upgraded!");
+        }
+
+
+>>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
         [Command("help")]
         public Task Help()
             => ReplyAsync(
@@ -64,6 +138,7 @@ namespace DiscordBot.Modules
                 //$"Hello, I am a bot called <@{Context.Message.Author.Id}> written in Discord.Net 1.0\n");
                 $"Hey {Context.Message.Author.Mention}, check out my Youtube channel! https://www.youtube.com/channel/UC8KGT0uZ19f6XJPUwxlvzPQ");
     
+<<<<<<< HEAD
         private async Task YearAsync(Discord.IGuildUser user, SocketGuild guild, string year)
         {
             int tag = int.Parse(year);
@@ -78,6 +153,22 @@ namespace DiscordBot.Modules
                 case 5: tagName = "Fifth Year"; break;
                 case 6: tagName = "Sixth Year"; break;
                 case 7: tagName = "Seventh Year"; break;
+=======
+        private async Task YearAsync(IGuildUser user, SocketGuild guild, string year)
+        {
+            int tag = int.Parse(year);
+            string tagName = "";
+            switch(tag)
+            {
+                case 0: tagName = "Alumni"; break;
+                case 1: tagName = "1st year"; break;
+                case 2: tagName = "2nd year"; break;
+                case 3: tagName = "3rd year"; break;
+                case 4: tagName = "4th year"; break;
+                case 5: tagName = "5th year"; break;
+                case 6: tagName = "6th year"; break;
+                case 7: tagName = "7th year"; break;
+>>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
                 default: break;
             }   
             string customMessage = findYearMessage(tag);
@@ -87,10 +178,17 @@ namespace DiscordBot.Modules
             return;
             
        }   
+<<<<<<< HEAD
        private async Task ProgramAsync(Discord.IGuildUser user, SocketGuild guild, string program)
         {
             int tag = int.Parse(program);
             string tagName = "Barista";
+=======
+       private async Task ProgramAsync(IGuildUser user, SocketGuild guild, string program)
+        {
+            int tag = int.Parse(program);
+            string tagName = "";
+>>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
             switch(tag)
             {
                 case 1: tagName = "Arts"; break;
@@ -129,11 +227,20 @@ namespace DiscordBot.Modules
             => 
                 ReplyAsync(message);
 
+<<<<<<< HEAD
+=======
+        private async Task UpgradeAsync(IGuildUser user, IRole currentRole, IRole nextRole)
+        {
+            await user.AddRoleAsync(nextRole);
+            await user.RemoveRoleAsync(currentRole);
+        }
+>>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
         private string findYearMessage(int year)
         {
             string customMessage = "";
             switch(year)
             {
+<<<<<<< HEAD
                 case 0: customMessage = "What are you doing here? Just kidding, anyone UBC-related is welcome."; break;
                 case 1: customMessage = "Welcome to UBC! I hope you are enjoying your first year."; break;
                 case 2: customMessage = "Thanks. How about them late registration dates, eh?"; break;
@@ -142,6 +249,16 @@ namespace DiscordBot.Modules
                 case 5: customMessage = "Thanks. I hope your half decade at UBC has been great!"; break;
                 case 6: customMessage = "Thanks. Going for the long haul, eh?"; break;
                 case 7: customMessage = "Thanks. I see you can't get enough of UBC, but you can't stay forever!"; break;
+=======
+                case 0: customMessage = _messages["Alumni"]; break;
+                case 1: customMessage = _messages["1st year"]; break;
+                case 2: customMessage = _messages["2nd year"]; break;
+                case 3: customMessage = _messages["3rd year"]; break;
+                case 4: customMessage = _messages["4th year"]; break;
+                case 5: customMessage = _messages["5th year"]; break;
+                case 6: customMessage = _messages["6th year"]; break;
+                case 7: customMessage = _messages["7th year"]; break;
+>>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
                 default: break;
             }
             return customMessage;
@@ -151,6 +268,7 @@ namespace DiscordBot.Modules
             string customMessage = "";
             switch(program)
             {
+<<<<<<< HEAD
                 case 1: customMessage = "Arts, eh? Tired of writing essays yet?"; break;
                 case 2: customMessage = "Architecture, eh? Planning on becoming the next Indiana Jones?"; break;
                 case 3: customMessage = "Biopsychology, eh? That's oddly specific."; break;
@@ -177,5 +295,42 @@ namespace DiscordBot.Modules
             }
             return customMessage;
         }
+=======
+                case 1: customMessage = _messages["Arts"]; break;
+                case 2: customMessage = _messages["Architecture"]; break;
+                case 3: customMessage = _messages["Biopsychology"]; break;
+                case 4: customMessage = _messages["Biotechnology"]; break;
+                case 5: customMessage = _messages["Computer Science"]; break;
+                case 6: customMessage = _messages["Engineering"]; break;
+                case 7: customMessage = _messages["Forestry"]; break;
+                case 8: customMessage = _messages["Integrated Sciences"]; break;
+                case 9: customMessage = _messages["Kinesiology"]; break;
+                case 10: customMessage = _messages["LFS"]; break;
+                case 11: customMessage = _messages["Music"]; break;
+                case 12: customMessage = _messages["Pharmacology"]; break;
+                case 13: customMessage = _messages["Pharmacy"]; break;
+                case 14: customMessage = _messages["Physics & Astronomy"]; break;
+                case 15: customMessage = _messages["Political Science"]; break;
+                case 16: customMessage = _messages["Sauder"]; break;
+                case 17: customMessage = _messages["Science"]; break;
+                case 18: customMessage = _messages["Statistics"]; break;
+                case 19: customMessage = _messages["VISA"]; break;
+                case 20: customMessage = _messages["Langara Student"]; break;
+                case 21: customMessage = _messages["UVIC/SFU Spy"]; break;
+                case 22: customMessage = _messages["High School Student"]; break;
+                default: break;
+            }
+
+            return customMessage;
+        }
+
+        private IConfiguration BuildMessages()
+        {
+            return new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("src/messages.json")
+                .Build();
+        }
+>>>>>>> 0dcf131c3f628d69e8083587382ca62c4831d815
     }
 }
