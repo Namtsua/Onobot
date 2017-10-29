@@ -16,7 +16,8 @@ namespace DiscordBot.Modules
         [Command("nuke")]
         public async Task Nuke(int messageCount)
         {
-            
+            var messageList = await Context.Channel.GetMessagesAsync(messageCount+1).Flatten();
+            await Context.Channel.DeleteMessagesAsync(messageList);
         }
 
         [Command("purge")]
