@@ -60,6 +60,7 @@ namespace DiscordBot.Services
         {
             var currentChannel = _discord.GetChannel(Convert.ToUInt64(_keys["General Channel"])) as SocketTextChannel;
             await currentChannel.SendMessageAsync(String.Format(_keys["Greeting"], user.Id));
+            await SendDM(user);
         }
 
         private async Task UserLeft(SocketGuildUser user)
@@ -77,6 +78,11 @@ namespace DiscordBot.Services
             var currentChannel = _discord.GetChannel(Convert.ToUInt64(_keys["General Channel"])) as SocketTextChannel;
             await currentChannel.SendMessageAsync(String.Format(_keys["Banned"], user.Id));
             _banned = true;
+        }
+
+        private async Task SendDM(SocketGuildUser user)
+        {
+            await user.SendMessageAsync(_keys["DM"]);
         }
 
         private IConfiguration BuildKeys()
