@@ -18,7 +18,6 @@ namespace DiscordBot.Modules
         [Command("youtube")]
         public Task Youtube()
             => ReplyAsync(
-                //$"Hello, I am a bot called <@{Context.Message.Author.Id}> written in Discord.Net 1.0\n");
                 $"Hey <@{Context.Message.Author.Id}>, check out my Youtube channel! https://www.youtube.com/channel/UC8KGT0uZ19f6XJPUwxlvzPQ");
     }
 }
