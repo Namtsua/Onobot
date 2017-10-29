@@ -14,6 +14,8 @@ namespace DiscordBot.Modules
 {
     public class AdminModule : ModuleBase<SocketCommandContext>
     {
+        private IConfiguration _keys;
+
         [Command("nuke")]
         public async Task Nuke(int messageCount)
         {
@@ -57,15 +59,19 @@ namespace DiscordBot.Modules
 
         private bool privilegeCheck(SocketGuildUser user)
         {
+            _keys = BuildKeys();
             var roles = (user as IGuildUser).Guild.Roles;
-            var admin = roles.FirstOrDefault(x => x.Name == "AMS Hack");
-            var mod = roles.FirstOrDefault(x => x.Name == "AMS Associate Hacks");
-            if (user.Roles.Contains(admin) || user.Roles.Contains(mod))
-            {
-                return true;
-            }
+            var admin = roles.FirstOrDefault(x => x.Id.ToString() == _keys["AMS Hack"]);
+            var mod = roles.FirstOrDefault(x => x.Id.ToString() == _keys["AMS Associate Hacks"]);
+            return user.Roles.Contains(admin) || user.Roles.Contains(mod);
+        }
 
-            return false;
+         private IConfiguration BuildKeys()
+        {
+            return new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("src/keys.json")
+                .Build();
         }
     }
 }
