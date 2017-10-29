@@ -1,6 +1,9 @@
 using System;
+using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -12,13 +15,20 @@ namespace DiscordBot.Services
         private readonly DiscordSocketClient _discord;
         private readonly CommandService _commands;
         private IServiceProvider _provider;
+        private IConfiguration _keys;
+
+        private bool _banned;
 
         public CommandHandlingService(IServiceProvider provider, DiscordSocketClient discord, CommandService commands)
         {
             _discord = discord;
             _commands = commands;
             _provider = provider;
+            _keys = BuildKeys();
 
+            _discord.UserJoined += UserJoined;
+            _discord.UserLeft += UserLeft;
+            _discord.UserBanned += UserBanned;
             _discord.MessageReceived += MessageReceived;
         }
 
@@ -44,6 +54,37 @@ namespace DiscordBot.Services
             if (result.Error.HasValue && 
                 result.Error.Value != CommandError.UnknownCommand)
                 await context.Channel.SendMessageAsync(result.ToString());
+        }
+
+        private async Task UserJoined(SocketGuildUser user)
+        {
+            var currentChannel = _discord.GetChannel(Convert.ToUInt64(_keys["General Channel"])) as SocketTextChannel;
+            await currentChannel.SendMessageAsync(String.Format(_keys["Greeting"], user.Id));
+        }
+
+        private async Task UserLeft(SocketGuildUser user)
+        {
+            if (_banned == false)
+            {
+                var currentChannel = _discord.GetChannel(Convert.ToUInt64(_keys["General Channel"])) as SocketTextChannel;
+                await currentChannel.SendMessageAsync(String.Format(_keys["Goodbye"], user.Id));
+            }
+            _banned = false;
+        }
+
+        private async Task UserBanned(SocketUser user, SocketGuild guild)
+        {
+            var currentChannel = _discord.GetChannel(Convert.ToUInt64(_keys["General Channel"])) as SocketTextChannel;
+            await currentChannel.SendMessageAsync(String.Format(_keys["Banned"], user.Id));
+            _banned = true;
+        }
+
+        private IConfiguration BuildKeys()
+        {
+            return new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("src/keys.json")
+                .Build();
         }
     }
 }   
