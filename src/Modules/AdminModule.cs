@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.WebSocket;
 using Discord.Net;
+
 namespace DiscordBot.Modules
 {
     public class AdminModule : ModuleBase<SocketCommandContext>
@@ -16,25 +17,30 @@ namespace DiscordBot.Modules
         [Command("nuke")]
         public async Task Nuke(int messageCount)
         {
-            var messageList = await Context.Channel.GetMessagesAsync(messageCount+1).Flatten();
-            await Context.Channel.DeleteMessagesAsync(messageList);
+            if (privilegeCheck(Context.User as SocketGuildUser))
+            {
+                var messageList = await Context.Channel.GetMessagesAsync(messageCount+1).Flatten();
+                await Context.Channel.DeleteMessagesAsync(messageList);
+            }
         }
 
         [Command("purge")]
-        public Task Help()
-            => ReplyAsync(
-                "Howdy <@{Context.Message.Author.Id}>, currently only the !year, !program, !ams and !youtube commands are supported, bug Namtsua if you want another feature to be added.");
+        public async Task Purge(IGuildUser target, int amount)
+        { 
+            if (privilegeCheck(Context.User as SocketGuildUser))
+            {
+                var messageList = await Context.Channel.GetMessagesAsync(100).Flatten();
+                var targetMessages = messageList.Where(x => x.Author == target).ToList();
+                await Context.Channel.DeleteMessagesAsync(targetMessages);
+            }
+        }
 
         [Command("kick")]
         public async Task Kick(IGuildUser target)
         {
-            var user = Context.User as SocketGuildUser;
-            var roles = (user as IGuildUser).Guild.Roles;
-            var admin = roles.FirstOrDefault(x => x.Name == "AMS Hack");
-            var mod = roles.FirstOrDefault(x => x.Name == "AMS Associate Hacks");
-            if (user.Roles.Contains(admin) || user.Roles.Contains(mod))
+            if (privilegeCheck(Context.User as SocketGuildUser))
             {
-                await ReplyAsync("Bye bye <@" + user.Id +"> :wave:");
+                await ReplyAsync("Bye bye <@" + target.Id +"> :wave:");
                 await target.KickAsync();
             }
         }
@@ -42,15 +48,24 @@ namespace DiscordBot.Modules
         [Command("ban")]
         public async Task Ban(IGuildUser target)
         {
-            var user = Context.User as SocketGuildUser;
+            if (privilegeCheck(Context.User as SocketGuildUser))
+            {
+                await ReplyAsync("Sayonara <@" + target.Id +"> :wave:");
+                await Context.Guild.AddBanAsync(target);
+            }
+        }
+
+        private bool privilegeCheck(SocketGuildUser user)
+        {
             var roles = (user as IGuildUser).Guild.Roles;
             var admin = roles.FirstOrDefault(x => x.Name == "AMS Hack");
             var mod = roles.FirstOrDefault(x => x.Name == "AMS Associate Hacks");
             if (user.Roles.Contains(admin) || user.Roles.Contains(mod))
             {
-                await ReplyAsync("Sayonara <@" + user.Id +"> :wave:");
-                await Context.Guild.AddBanAsync(target);
+                return true;
             }
+
+            return false;
         }
     }
 }
