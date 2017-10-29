@@ -46,4 +46,4 @@ namespace DiscordBot.Services
                 await context.Channel.SendMessageAsync(result.ToString());
         }
     }
-}
+}   
