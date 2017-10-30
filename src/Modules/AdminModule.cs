@@ -14,64 +14,37 @@ namespace DiscordBot.Modules
 {
     public class AdminModule : ModuleBase<SocketCommandContext>
     {
-        private IConfiguration _keys;
-
         [Command("nuke")]
+        [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task Nuke(int messageCount)
         {
-            if (privilegeCheck(Context.User as SocketGuildUser))
-            {
-                var messageList = await Context.Channel.GetMessagesAsync(messageCount+1).Flatten();
-                await Context.Channel.DeleteMessagesAsync(messageList);
-            }
+            var messageList = await Context.Channel.GetMessagesAsync(messageCount+1).Flatten();
+            await Context.Channel.DeleteMessagesAsync(messageList);
         }
 
         [Command("purge")]
+        [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task Purge(IGuildUser target, int amount)
-        { 
-            if (privilegeCheck(Context.User as SocketGuildUser))
-            {
-                var messageList = await Context.Channel.GetMessagesAsync(100).Flatten();
-                var targetMessages = messageList.Where(x => x.Author == target).ToList();
-                await Context.Channel.DeleteMessagesAsync(targetMessages);
-            }
+        {
+            var messageList = await Context.Channel.GetMessagesAsync(100).Flatten();
+            var targetMessages = messageList.Where(x => x.Author == target).ToList();
+            await Context.Channel.DeleteMessagesAsync(targetMessages);
         }
 
         [Command("kick")]
+        [RequireUserPermission(GuildPermission.KickMembers)]
         public async Task Kick(IGuildUser target)
         {
-            if (privilegeCheck(Context.User as SocketGuildUser))
-            {
-                await ReplyAsync("Bye bye <@" + target.Id +"> :wave:");
-                await target.KickAsync();
-            }
+            await ReplyAsync("Bye bye <@" + target.Id +"> :wave:");
+            await target.KickAsync();
         }
 
         [Command("ban")]
+        [RequireUserPermission(GuildPermission.BanMembers)]
         public async Task Ban(IGuildUser target)
         {
-            if (privilegeCheck(Context.User as SocketGuildUser))
-            {
-                await ReplyAsync("Sayonara <@" + target.Id +"> :wave:");
-                await Context.Guild.AddBanAsync(target);
-            }
-        }
-
-        private bool privilegeCheck(SocketGuildUser user)
-        {
-            _keys = BuildKeys();
-            var roles = (user as IGuildUser).Guild.Roles;
-            var admin = roles.FirstOrDefault(x => x.Id.ToString() == _keys["AMS Hack"]);
-            var mod = roles.FirstOrDefault(x => x.Id.ToString() == _keys["AMS Associate Hacks"]);
-            return user.Roles.Contains(admin) || user.Roles.Contains(mod);
-        }
-
-         private IConfiguration BuildKeys()
-        {
-            return new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("src/keys.json")
-                .Build();
+            await ReplyAsync("Sayonara <@" + target.Id +"> :wave:");
+            await Context.Guild.AddBanAsync(target);
         }
     }
 }

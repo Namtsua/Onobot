@@ -24,7 +24,7 @@ namespace DiscordBot.Services
             _discord = discord;
             _commands = commands;
             _provider = provider;
-            _keys = BuildKeys();
+           _keys = BuildKeys();
 
             _discord.UserJoined += UserJoined;
             _discord.UserLeft += UserLeft;
@@ -52,12 +52,13 @@ namespace DiscordBot.Services
             var result = await _commands.ExecuteAsync(context, argPos, _provider);
 
             if (result.Error.HasValue && 
-                result.Error.Value != CommandError.UnknownCommand)
+                result.Error.Value != CommandError.UnknownCommand &&
+                result.Error.Value != CommandError.UnmetPrecondition)
                 await context.Channel.SendMessageAsync(result.ToString());
         }
 
         private async Task UserJoined(SocketGuildUser user)
-        {
+        {   
             var currentChannel = _discord.GetChannel(Convert.ToUInt64(_keys["General Channel"])) as SocketTextChannel;
             await currentChannel.SendMessageAsync(String.Format(_keys["Greeting"], user.Id));
             await SendDM(user);
