@@ -121,7 +121,7 @@ namespace DiscordBot.Modules
             }   
             string customMessage = findYearMessage(tag);
             await Reply(customMessage);
-            var selectedRole = guild.Roles.FirstOrDefault(x => x.Id.ToString() == _keys[tagID]);
+            var selectedRole = guild.Roles.FirstOrDefault(x => x.Id.ToString() == tagID);
             await user.AddRoleAsync(selectedRole);
             return;
             
