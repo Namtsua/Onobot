@@ -51,9 +51,11 @@ namespace DiscordBot.Services
             var context = new SocketCommandContext(_discord, message);
             var result = await _commands.ExecuteAsync(context, argPos, _provider);
 
-            if (result.Error.HasValue && 
-                result.Error.Value != CommandError.UnknownCommand)
-                await context.Channel.SendMessageAsync(result.ToString());
+            // if (result.Error.HasValue && 
+            //     result.Error.Value != CommandError.UnknownCommand &&
+            //     result.Error.Value != CommandError.UnmetPrecondition &&
+            //     result.Error.Value != CommandError.BadArgCount)
+            //     await context.Channel.SendMessageAsync(result.ToString());
         }
 
         private async Task UserJoined(SocketGuildUser user)
