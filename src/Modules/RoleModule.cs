@@ -100,6 +100,31 @@ namespace DiscordBot.Modules
 
             await ReplyAsync("You've been downgraded!");
         }
+
+        [Command("graduate")]
+        public async Task Graduate()
+        {
+            _keys = BuildKeys();
+            var user = Context.User as SocketGuildUser;
+            var yearRoles = getYearRoles((user as IGuildUser), _keys);
+
+            // Short circuit if they're already an Alumni
+            if (user.Roles.Contains(yearRoles.Last()))
+            {
+                return;
+            }
+
+            foreach (IRole role in yearRoles)
+            {
+                if (user.Roles.Contains(role))
+                {
+                    await user.RemoveRoleAsync(role);
+                }
+            }
+
+            await user.AddRoleAsync(yearRoles.Last());
+            await ReplyAsync("Congratulations on the graduation!!!!!");
+        }
     
         private async Task YearAsync(IGuildUser user, SocketGuild guild, string year)
         {
