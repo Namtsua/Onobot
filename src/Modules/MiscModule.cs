@@ -37,6 +37,14 @@ namespace DiscordBot.Modules
             await ReplyAsync(String.Format(_messages["Youtube"], Context.Message.Author.Id));
         }
 
+        [Command("shrug")]
+        public async Task Shrug()
+        {
+            _messages = BuildMessages();
+            await Context.Message.DeleteAsync();
+            await ReplyAsync(_messages["Shrug"]);
+        }
+
         private IConfiguration BuildMessages()
         {
             return new ConfigurationBuilder()
