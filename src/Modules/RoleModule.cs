@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections;
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Discord;
@@ -31,6 +32,7 @@ namespace DiscordBot.Modules
             _keys = BuildKeys();
             var user = Context.User;
             var guild = Context.Guild;
+            await RemoveYearsAsync((user as IGuildUser), guild, year);
             await YearAsync((user as IGuildUser), guild, year);
         }
         public Task Year()
@@ -60,47 +62,43 @@ namespace DiscordBot.Modules
         [Command("upgrade")]
         public async Task Upgrade()
         {
+            _keys = BuildKeys();
             var user = Context.User as SocketGuildUser;
-            var roles = (user as IGuildUser).Guild.Roles;
-            var firstYear = roles.FirstOrDefault(x => x.Id.ToString() == _keys["1st year"]);
-            var secondYear = roles.FirstOrDefault(x => x.Id.ToString() == _keys["2nd year"]);
-            var thirdYear = roles.FirstOrDefault(x => x.Id.ToString() == _keys["3rd year"]);
-            var fourthYear = roles.FirstOrDefault(x => x.Id.ToString() == _keys["4th year"]);
-            var fifthYear = roles.FirstOrDefault(x => x.Id.ToString() == _keys["5th year"]);
-            var sixthYear = roles.FirstOrDefault(x => x.Id.ToString() == _keys["6th year"]);
-            var seventhYear = roles.FirstOrDefault(x => x.Id.ToString() == _keys["7th year"]);
-            var alumni = roles.FirstOrDefault(x => x.Id.ToString() == _keys["Alumni"]);
-            
-            if (user.Roles.Contains(firstYear))
+            var yearRoles = getYearRoles((user as IGuildUser), _keys);
+
+            for (int i = 0; i < yearRoles.Count - 1; i++)
             {
-                await UpgradeAsync(user,firstYear,secondYear);
-            }
-            else if (user.Roles.Contains(secondYear))
-            {
-                await UpgradeAsync(user,secondYear,thirdYear);
-            }
-            else if (user.Roles.Contains(thirdYear))
-            {
-                await UpgradeAsync(user,thirdYear,fourthYear);
-            }
-            else if (user.Roles.Contains(fourthYear))
-            {
-               await UpgradeAsync(user,fourthYear,fifthYear);
-            }
-            else if (user.Roles.Contains(fifthYear))
-            {
-               await UpgradeAsync(user,fifthYear,sixthYear);
-            }
-            else if (user.Roles.Contains(sixthYear))
-            {
-               await UpgradeAsync(user,sixthYear,seventhYear);
-            }
-            else if (user.Roles.Contains(seventhYear))
-            {
-               await UpgradeAsync(user,seventhYear,alumni);
+                var currentRole = yearRoles[i];
+                var nextRole = yearRoles[i+1];
+                if (user.Roles.Contains(currentRole))
+                {
+                    await SwapAsync(user,currentRole,nextRole);
+                    break;
+                }
             }
 
             await ReplyAsync("You've been upgraded!");
+        }
+
+        [Command("downgrade")]
+        public async Task Downgrade()
+        {
+            _keys = BuildKeys();
+            var user = Context.User as SocketGuildUser;
+            var yearRoles = getYearRoles((user as IGuildUser), _keys);
+
+            for (int i = 1; i < yearRoles.Count; i++)
+            {
+                var currentRole = yearRoles[i];
+                var previousRole = yearRoles[i-1];
+                if (user.Roles.Contains(currentRole))
+                {
+                    await SwapAsync(user,currentRole,previousRole);
+                    break;
+                }
+            }
+
+            await ReplyAsync("You've been downgraded!");
         }
     
         private async Task YearAsync(IGuildUser user, SocketGuild guild, string year)
@@ -121,11 +119,26 @@ namespace DiscordBot.Modules
             }   
             string customMessage = findYearMessage(tag);
             await Reply(customMessage);
+
             var selectedRole = guild.Roles.FirstOrDefault(x => x.Id.ToString() == tagID);
-            await user.AddRoleAsync(selectedRole);
-            return;
-            
+            await user.AddRoleAsync(selectedRole);            
        }   
+
+       private async Task RemoveYearsAsync(IGuildUser user, SocketGuild guild, string year)
+       {
+            _keys = BuildKeys();
+            var sUser = Context.User as SocketGuildUser;
+            var yearRoles = getYearRoles(user, _keys);
+
+            foreach (IRole role in yearRoles)
+            {
+                if (sUser.Roles.Contains(role))
+                {
+                    await user.RemoveRoleAsync(role);
+                }
+            }
+       }
+
        private async Task ProgramAsync(IGuildUser user, SocketGuild guild, string program)
         {
             int tag = int.Parse(program);
@@ -168,11 +181,28 @@ namespace DiscordBot.Modules
             => 
                 ReplyAsync(message);
 
-        private async Task UpgradeAsync(IGuildUser user, IRole currentRole, IRole nextRole)
+        private async Task SwapAsync(IGuildUser user, IRole currentRole, IRole nextRole)
         {
             await user.AddRoleAsync(nextRole);
             await user.RemoveRoleAsync(currentRole);
         }
+
+        private List<IRole> getYearRoles(IGuildUser user, IConfiguration keys)
+        {
+            List<IRole> yearRoles = new List<IRole>();
+            var roles = user.Guild.Roles;
+            yearRoles.Add(roles.FirstOrDefault(x => x.Id.ToString() == keys["1st year"]));
+            yearRoles.Add(roles.FirstOrDefault(x => x.Id.ToString() == keys["2nd year"]));
+            yearRoles.Add(roles.FirstOrDefault(x => x.Id.ToString() == keys["3rd year"]));
+            yearRoles.Add(roles.FirstOrDefault(x => x.Id.ToString() == keys["4th year"]));
+            yearRoles.Add(roles.FirstOrDefault(x => x.Id.ToString() == keys["5th year"]));
+            yearRoles.Add(roles.FirstOrDefault(x => x.Id.ToString() == keys["6th year"]));
+            yearRoles.Add(roles.FirstOrDefault(x => x.Id.ToString() == keys["7th year"]));
+            yearRoles.Add(roles.FirstOrDefault(x => x.Id.ToString() == keys["Alumni"]));
+ 
+            return yearRoles;
+        }
+
         private string findYearMessage(int year)
         {
             string customMessage = "";
