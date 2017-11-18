@@ -125,6 +125,21 @@ namespace DiscordBot.Modules
             await user.AddRoleAsync(yearRoles.Last());
             await ReplyAsync("Congratulations on the graduation!!!!!");
         }
+
+        [Command("remove")]
+        public async Task Remove(string role="")
+        {
+            _keys = BuildKeys();  
+            var user = Context.User as SocketGuildUser;  
+            var roles = user.Guild.Roles;
+            var toBeRemoved = roles.FirstOrDefault(x => x.Name.ToLower() == role.ToLower());
+
+            if (user.Roles.Contains(toBeRemoved))
+            {
+                await user.RemoveRoleAsync(toBeRemoved);
+                await ReplyAsync(toBeRemoved.Name + " has been removed!");
+            }
+        }
     
         private async Task YearAsync(IGuildUser user, SocketGuild guild, string year)
         {
