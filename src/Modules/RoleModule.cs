@@ -151,9 +151,9 @@ namespace DiscordBot.Modules
                 case 17: tagID = _keys["Science"]; break;
                 case 18: tagID = _keys["Statistics"]; break;
                 case 19: tagID = _keys["VISA"]; break;
-                case 20: tagID = _keys["Langara Student"]; break;
-                case 21: tagID = _keys["UVIC/SFU Spy"]; break;
-                case 22: tagID = _keys["High School Student"]; break;
+                case 21: tagID = _keys["Langara Student"]; break;
+                case 22: tagID = _keys["UVIC/SFU Spy"]; break;
+                case 23: tagID = _keys["High School Student"]; break;
                 default: break;
             }   
             string customMessage = findProgramMessage(tag);
