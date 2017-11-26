@@ -4,12 +4,15 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Discord.Net;
+using ProgramEnum;
 
 namespace DiscordBot.Modules
 {
@@ -140,6 +143,22 @@ namespace DiscordBot.Modules
                 await ReplyAsync(toBeRemoved.Name + " has been removed!");
             }
         }
+
+        [Command("remove")]
+        public async Task Remove(int role=0)
+        {
+            _keys = BuildKeys();  
+            var roleString = ProgramTypeDescription((ProgramEnum.Programs)role);
+            var user = Context.User as SocketGuildUser;  
+            var roles = user.Guild.Roles;
+            var toBeRemoved = roles.FirstOrDefault(x => x.Name.ToLower() == roleString.ToLower());
+
+            if (user.Roles.Contains(toBeRemoved))
+            {
+                await user.RemoveRoleAsync(toBeRemoved);
+                await ReplyAsync(toBeRemoved.Name + " has been removed!");
+            }
+        }
     
         private async Task YearAsync(IGuildUser user, SocketGuild guild, string year)
         {
@@ -204,9 +223,9 @@ namespace DiscordBot.Modules
                 case 17: tagID = _keys["Science"]; break;
                 case 18: tagID = _keys["Statistics"]; break;
                 case 19: tagID = _keys["VISA"]; break;
-                case 21: tagID = _keys["Langara Student"]; break;
-                case 22: tagID = _keys["UVIC/SFU Spy"]; break;
-                case 23: tagID = _keys["High School Student"]; break;
+                case 20: tagID = _keys["Langara Student"]; break;
+                case 21: tagID = _keys["UVIC/SFU Spy"]; break;
+                case 22: tagID = _keys["High School Student"]; break;
                 default: break;
             }   
             string customMessage = findProgramMessage(tag);
@@ -287,10 +306,26 @@ namespace DiscordBot.Modules
                 case 20: customMessage = _messages["Langara Student"]; break;
                 case 21: customMessage = _messages["UVIC/SFU Spy"]; break;
                 case 22: customMessage = _messages["High School Student"]; break;
+                case 23: customMessage = _messages["No Program"]; break;
                 default: break;
             }
 
             return customMessage;
+        }
+
+        //https://social.msdn.microsoft.com/Forums/vstudio/en-US/562c4b8c-2960-4983-85ea-dcd7c06b6dce/getting-the-description-of-the-enum-value?forum=csharpgeneral
+         private string ProgramTypeDescription(Enum ProgramType)
+        {
+            FieldInfo fi = ProgramType.GetType().GetField(ProgramType.ToString());
+            DescriptionAttribute[] attributes = (DescriptionAttribute[])fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
+            if (attributes.Length > 0)
+            {
+                return attributes[0].Description;
+            }
+            else
+            {
+                return ProgramType.ToString();
+            }
         }
 
         private IConfiguration BuildMessages()
