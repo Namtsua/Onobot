@@ -174,7 +174,7 @@ namespace DiscordBot.Modules
                 case 5: tagID = _keys["5th year"]; break;
                 case 6: tagID = _keys["6th year"]; break;
                 case 7: tagID = _keys["7th year"]; break;
-                default: break;
+                default: return;
             }   
             string customMessage = findYearMessage(tag);
             await Reply(customMessage);
@@ -201,6 +201,10 @@ namespace DiscordBot.Modules
        private async Task ProgramAsync(IGuildUser user, SocketGuild guild, string program)
         {
             int tag = int.Parse(program);
+            string customMessage = findProgramMessage(tag);
+            if (string.IsNullOrEmpty(customMessage)) return;
+
+            await Reply(customMessage);
             string tagID = "";
             switch(tag)
             {
@@ -226,10 +230,9 @@ namespace DiscordBot.Modules
                 case 20: tagID = _keys["Langara Student"]; break;
                 case 21: tagID = _keys["UVIC/SFU Spy"]; break;
                 case 22: tagID = _keys["High School Student"]; break;
+                case 23: return;
                 default: break;
             }   
-            string customMessage = findProgramMessage(tag);
-            await Reply(customMessage);
             var selectedRole = guild.Roles.FirstOrDefault(x => x.Id.ToString() == tagID);
             await user.AddRoleAsync(selectedRole);
             return;

@@ -62,7 +62,7 @@ using System.ComponentModel;
             [Description("VISA")]
             VISA, 
             
-            [Description("Langara")]
+            [Description("Langara Student")]
             Langara, 
             
             [Description("UVIC/SFU Spy")]

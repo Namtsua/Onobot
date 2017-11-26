@@ -26,9 +26,11 @@ namespace DiscordBot.Modules
         [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task Purge(IGuildUser target, int amount)
         {
+            if (amount <= 0) return;
             var messageList = await Context.Channel.GetMessagesAsync(100).Flatten();
             var targetMessages = messageList.Where(x => x.Author == target).ToList();
-            await Context.Channel.DeleteMessagesAsync(targetMessages);
+            var specifiedTargetMessages = targetMessages.GetRange(0,amount);
+            await Context.Channel.DeleteMessagesAsync(specifiedTargetMessages);
         }
 
         [Command("kick")]
