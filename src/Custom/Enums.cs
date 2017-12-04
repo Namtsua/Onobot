@@ -34,6 +34,9 @@ using System.ComponentModel;
             
             [Description("LFS")]
             LFS, 
+
+            [Description("Linguistics")]
+            Linguistics,
             
             [Description("Music")]
             Music, 
