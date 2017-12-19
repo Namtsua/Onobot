@@ -1,7 +1,9 @@
 using System;
+using System.Linq;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Timers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Discord;
@@ -12,85 +14,69 @@ namespace DiscordBot.Services
 {
     public class ScheduleService
     {
-    //     private readonly DiscordSocketClient _discord;
-    //     private readonly CommandService _commands;
-    //     private IServiceProvider _provider;
-    //     private IConfiguration _keys;
+         private readonly DiscordSocketClient _discord;
+         private readonly CommandService _commands;
+         private IServiceProvider _provider;
+         private IConfiguration _messages;
 
-    //     private bool _banned;
+        public ScheduleService(IServiceProvider provider, DiscordSocketClient discord, CommandService commands)
+        {
+            _discord = discord;
+            _commands = commands;
+            _provider = provider;
+            _messages = BuildMessages();
 
-    //     public CommandHandlingService(IServiceProvider provider, DiscordSocketClient discord, CommandService commands)
-    //     {
-    //         _discord = discord;
-    //         _commands = commands;
-    //         _provider = provider;
-    //         _keys = BuildKeys();
+            _discord.MessageReceived += MessageReceived;
+        }
 
-    //         _discord.UserJoined += UserJoined;
-    //         _discord.UserLeft += UserLeft;
-    //         _discord.UserBanned += UserBanned;
-    //         _discord.MessageReceived += MessageReceived;
-    //     }
+        public async void ScheduleNightChannelOpen(Func<SocketCommandContext, Task> firstAction, Func<SocketCommandContext, Task> secondAction, SocketCommandContext context, DateTime ExecutionTime)
+        {
+            await Task.Delay((int)ExecutionTime.Subtract(DateTime.Now).TotalMilliseconds);
+            await firstAction(context);
+            ScheduleNightChannelClose(secondAction, firstAction, context, DateTime.Now.AddHours(5)); // Close at 5am
+        }
 
-    //     public async Task InitializeAsync(IServiceProvider provider)
-    //     {
-    //         _provider = provider;
-    //         await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
-    //         // Add additional initialization code here...
-    //     }
+        public async void ScheduleNightChannelClose(Func<SocketCommandContext, Task> firstAction, Func<SocketCommandContext, Task> secondAction, SocketCommandContext context, DateTime ExecutionTime)
+        {
+            await Task.Delay((int)ExecutionTime.Subtract(DateTime.Now).TotalMilliseconds);
+            await firstAction(context);
+            ScheduleNightChannelOpen(secondAction, firstAction, context, DateTime.Now.AddHours(19)); // Open at midnight
+        }
 
-    //     private async Task MessageReceived(SocketMessage rawMessage)
-    //     {
-    //         // Ignore system messages and messages from bots
-    //         if (!(rawMessage is SocketUserMessage message)) return;
-    //         if (message.Source != MessageSource.User) return;
+        private async Task CreateNightChannel(SocketCommandContext context)
+        {
+            var nightChannel = await context.Guild.CreateTextChannelAsync(_messages["Night Channel"]);
+            await context.Channel.SendMessageAsync(String.Format(_messages["Night Channel Opens"], nightChannel.Id));
+        }
 
-    //         int argPos = 0;
-    //         if (!message.HasStringPrefix("^", ref argPos)) return;
+        private async Task CloseNightChannel(SocketCommandContext context)
+        {
+            await context.Channel.SendMessageAsync(_messages["Night Channel Closes"]);
+            var nightChannel = context.Guild.Channels.FirstOrDefault(x => x.Name.ToLower() == _messages["Night Channel"]);
+            await nightChannel.DeleteAsync();
+        }
 
-    //         var context = new SocketCommandContext(_discord, message);
-    //         var result = await _commands.ExecuteAsync(context, argPos, _provider);
+        private async Task MessageReceived(SocketMessage rawMessage)
+        {
+            // Ignore system messages and messages from bots
+            if (!(rawMessage is SocketUserMessage message)) return;
+            if (message.Source != MessageSource.User) return;
 
-    //         if (result.Error.HasValue && 
-    //             result.Error.Value != CommandError.UnknownCommand)
-    //             await context.Channel.SendMessageAsync(result.ToString());
-    //     }
+            int argPos = 0;
+            if (!message.HasStringPrefix("$begin", ref argPos) || message.Author.Id.ToString() != _messages["Night Channel Gatekeeper"]) return;
+            
+            Func<SocketCommandContext, Task> channelCreation = new Func<SocketCommandContext, Task>(CreateNightChannel);
+            Func<SocketCommandContext, Task> channelDeletion = new Func<SocketCommandContext, Task>(CloseNightChannel);
 
-    //     private async Task UserJoined(SocketGuildUser user)
-    //     {
-    //         var currentChannel = _discord.GetChannel(Convert.ToUInt64(_keys["General Channel"])) as SocketTextChannel;
-    //         await currentChannel.SendMessageAsync(String.Format(_keys["Greeting"], user.Id));
-    //         await SendDM(user);
-    //     }
-
-    //     private async Task UserLeft(SocketGuildUser user)
-    //     {
-    //         if (_banned == false)
-    //         {
-    //             var currentChannel = _discord.GetChannel(Convert.ToUInt64(_keys["General Channel"])) as SocketTextChannel;
-    //             await currentChannel.SendMessageAsync(String.Format(_keys["Goodbye"], user.Id));
-    //         }
-    //         _banned = false;
-    //     }
-
-    //     private async Task UserBanned(SocketUser user, SocketGuild guild)
-    //     {
-    //         var currentChannel = _discord.GetChannel(Convert.ToUInt64(_keys["General Channel"])) as SocketTextChannel;
-    //         await currentChannel.SendMessageAsync(String.Format(_keys["Banned"], user.Id));
-    //         _banned = true;
-    //     }
-
-    //     private async Task SendDM(SocketGuildUser user)
-    //     {
-    //         await user.SendMessageAsync(_keys["DM"]);
-    //     }
-
-    //     private IConfiguration BuildKeys()
-    //     {
-    //         return new ConfigurationBuilder()
-    //             .SetBasePath(Directory.GetCurrentDirectory())
-    //             .AddJsonFile("src/keys.json")
-    //             .Build();
-    //     }
+            var context = new SocketCommandContext(_discord, message);
+            ScheduleNightChannelOpen(channelCreation, channelDeletion, context, DateTime.Now.Date.AddDays(1));
+        }
+        private IConfiguration BuildMessages()
+        {
+            return new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("src/messages.json")
+                .Build();
+        }
      }
 }   
