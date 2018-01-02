@@ -37,6 +37,9 @@ using System.ComponentModel;
 
             [Description("Linguistics")]
             Linguistics,
+
+            [Description("Masters")]
+            Masters,
             
             [Description("Music")]
             Music, 
@@ -46,6 +49,9 @@ using System.ComponentModel;
             
             [Description("Pharmacy")]
             Pharmacy,
+
+            [Description("PhD")]
+            PhD,
             
             [Description("Physics & Astronomy")]
             PhysicsAstronomy, 
@@ -72,6 +78,6 @@ using System.ComponentModel;
             UVICSFU, 
             
             [Description("High School Student")]
-            HighSchool 
+            HighSchool
         };
 }
