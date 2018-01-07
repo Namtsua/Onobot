@@ -38,6 +38,9 @@ using System.ComponentModel;
             [Description("Linguistics")]
             Linguistics,
 
+            [Description("Math")]
+            Math,
+
             [Description("Masters")]
             Masters,
             
