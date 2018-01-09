@@ -29,18 +29,18 @@ namespace DiscordBot.Services
             _discord.MessageReceived += MessageReceived;
         }
 
-        public async void ScheduleNightChannelOpen(Func<SocketCommandContext, Task> firstAction, Func<SocketCommandContext, Task> secondAction, SocketCommandContext context, DateTime ExecutionTime)
+        public async Task ScheduleNightChannelOpen(Func<SocketCommandContext, Task> firstAction, Func<SocketCommandContext, Task> secondAction, SocketCommandContext context, DateTime ExecutionTime)
         {
             await Task.Delay((int)ExecutionTime.Subtract(DateTime.Now).TotalMilliseconds);
             await firstAction(context);
-            ScheduleNightChannelClose(secondAction, firstAction, context, DateTime.Now.AddHours(5)); // Close at 5am
+            await ScheduleNightChannelClose(secondAction, firstAction, context, DateTime.Now.AddHours(5)); // Close at 5am
         }
 
-        public async void ScheduleNightChannelClose(Func<SocketCommandContext, Task> firstAction, Func<SocketCommandContext, Task> secondAction, SocketCommandContext context, DateTime ExecutionTime)
+        public async Task ScheduleNightChannelClose(Func<SocketCommandContext, Task> firstAction, Func<SocketCommandContext, Task> secondAction, SocketCommandContext context, DateTime ExecutionTime)
         {
             await Task.Delay((int)ExecutionTime.Subtract(DateTime.Now).TotalMilliseconds);
             await firstAction(context);
-            ScheduleNightChannelOpen(secondAction, firstAction, context, DateTime.Now.AddHours(19)); // Open at midnight
+            await ScheduleNightChannelOpen(secondAction, firstAction, context, DateTime.Now.AddHours(19)); // Open at midnight
         }
 
         private async Task CreateNightChannel(SocketCommandContext context)
@@ -69,7 +69,7 @@ namespace DiscordBot.Services
             Func<SocketCommandContext, Task> channelDeletion = new Func<SocketCommandContext, Task>(CloseNightChannel);
 
             var context = new SocketCommandContext(_discord, message);
-            ScheduleNightChannelOpen(channelCreation, channelDeletion, context, DateTime.Now.Date.AddDays(1));
+            await ScheduleNightChannelOpen(channelCreation, channelDeletion, context, DateTime.Now.Date.AddDays(1));
         }
         private IConfiguration BuildMessages()
         {

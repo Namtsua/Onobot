@@ -6,11 +6,20 @@
     "tasks": [
         {
             "taskName": "build",
-            "args": [
-                "${workspaceRoot}/src/Onobot.csproj"
-            ],
+            "suppressTaskName": true,
+            "args": ["build", "${workspaceRoot}/src/Onobot.csproj"],
+            "showOutput" :"always",
+            "isBuildCommand": true,
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "taskName": "publish",
+            "suppressTaskName": true,
+            "args" : ["publish", "${workspaceRoot}/src/Onobot.csproj", "-f", "netcoreapp2.0", "-c", "Release"],
+            "showOutput": "always",
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"
         }
+
     ]
 }
