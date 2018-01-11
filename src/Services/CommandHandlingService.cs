@@ -41,6 +41,7 @@ namespace DiscordBot.Services
 
         private async Task MessageReceived(SocketMessage rawMessage)
         {
+
             // Ignore system messages and messages from bots
             if (!(rawMessage is SocketUserMessage message)) return;
             if (message.Source != MessageSource.User) return;
@@ -50,6 +51,7 @@ namespace DiscordBot.Services
 
             var context = new SocketCommandContext(_discord, message);
             var result = await _commands.ExecuteAsync(context, argPos, _provider);
+            
 
             // if (result.Error.HasValue && 
             //     result.Error.Value != CommandError.UnknownCommand &&
@@ -67,12 +69,15 @@ namespace DiscordBot.Services
 
         private async Task UserLeft(SocketGuildUser user)
         {
+            var currentChannel = _discord.GetChannel(Convert.ToUInt64(_keys["General Channel"])) as SocketTextChannel;
+         
             if (_banned == false)
             {
-                var currentChannel = _discord.GetChannel(Convert.ToUInt64(_keys["General Channel"])) as SocketTextChannel;
                 await currentChannel.SendMessageAsync(String.Format(_keys["Goodbye"], user.Id));
+                _banned = false;
             }
-            _banned = false;
+            
+            await SendEmbeddedMessage(user, currentChannel);
         }
 
         private async Task UserBanned(SocketUser user, SocketGuild guild)
@@ -85,6 +90,17 @@ namespace DiscordBot.Services
         private async Task SendDM(SocketGuildUser user)
         {
             await user.SendMessageAsync(_keys["DM"]);
+        }
+
+        private async Task SendEmbeddedMessage(SocketGuildUser user, SocketTextChannel currentChannel)
+        {   
+            // Build embed event for mobile users to see who left
+            var embedBuilder = new EmbedBuilder();
+            embedBuilder.WithDescription(String.Format(_keys["Mobile"], user.Nickname, user.Username));
+            embedBuilder.WithColor(Color.Red);
+            embedBuilder.WithCurrentTimestamp();
+            embedBuilder.WithAuthor(_discord.CurrentUser);
+            await currentChannel.SendMessageAsync("", false, embedBuilder);
         }
 
         private IConfiguration BuildKeys()
