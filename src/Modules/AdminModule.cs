@@ -27,10 +27,14 @@ namespace DiscordBot.Modules
         public async Task Purge(IGuildUser target, int amount)
         {
             if (amount <= 0) return;
-            var messageList = await Context.Channel.GetMessagesAsync(100).Flatten();
+            var messageList = await Context.Channel.GetMessagesAsync(amount).Flatten();
             var targetMessages = messageList.Where(x => x.Author == target).ToList();
-            var specifiedTargetMessages = targetMessages.GetRange(0,amount);
-            await Context.Channel.DeleteMessagesAsync(specifiedTargetMessages);
+            if (targetMessages.Count <= 0) return;
+            // Mass message deletion doesn't work on 2+ week old messages, so this is a workaround
+            foreach (IMessage message in targetMessages)
+            {
+                await message.DeleteAsync();
+            }
         }
 
         [Command("kick")]
