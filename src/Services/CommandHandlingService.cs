@@ -41,7 +41,6 @@ namespace DiscordBot.Services
 
         private async Task MessageReceived(SocketMessage rawMessage)
         {
-
             // Ignore system messages and messages from bots
             if (!(rawMessage is SocketUserMessage message)) return;
             if (message.Source != MessageSource.User) return;
@@ -51,7 +50,6 @@ namespace DiscordBot.Services
 
             var context = new SocketCommandContext(_discord, message);
             var result = await _commands.ExecuteAsync(context, argPos, _provider);
-            
 
             // if (result.Error.HasValue && 
             //     result.Error.Value != CommandError.UnknownCommand &&

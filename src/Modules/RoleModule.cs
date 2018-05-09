@@ -52,11 +52,19 @@ namespace DiscordBot.Modules
                 return;
                 
             }
-
             _keys = BuildKeys();
             var user = Context.User;
             var guild = Context.Guild;
-            await ProgramAsync((user as IGuildUser), guild, program);
+            HashSet<string> programs = program.Split(',').ToHashSet();
+            if (programs.Count > 3) 
+            {
+                await ReplyAsync(String.Format(_messages["Too Many Programs"], Context.Message.Author.Mention));
+                return;
+            }
+            foreach (string prog in programs)
+            {
+                await ProgramAsync((user as IGuildUser), guild, prog);
+            }
         }
         public Task Program()
            => ReplyAsync(String.Format(_messages["Program Alternative Explanation"], Context.Message.Author.Id));
@@ -201,10 +209,6 @@ namespace DiscordBot.Modules
        private async Task ProgramAsync(IGuildUser user, SocketGuild guild, string program)
         {
             int tag = int.Parse(program);
-            string customMessage = findProgramMessage(tag);
-            if (string.IsNullOrEmpty(customMessage)) return;
-
-            await Reply(customMessage);
             string tagID = "";
             switch(tag)
             {
@@ -237,8 +241,15 @@ namespace DiscordBot.Modules
                 case 27: return;
                 default: break;
             }   
+            
             var selectedRole = guild.Roles.FirstOrDefault(x => x.Id.ToString() == tagID);
-            await user.AddRoleAsync(selectedRole);
+            if (!(user as SocketGuildUser).Roles.Contains(selectedRole as IRole))
+            {
+                string customMessage = findProgramMessage(tag);
+                if (string.IsNullOrEmpty(customMessage)) return;
+                await user.AddRoleAsync(selectedRole);
+                await Reply(customMessage);
+            }
             return;
             
        }   
