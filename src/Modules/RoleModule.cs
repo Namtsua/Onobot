@@ -212,15 +212,15 @@ namespace DiscordBot.Modules
             string tagID = "";
             switch(tag)
             {
-                case 1: tagID = _keys["Arts"]; break;
-                case 2: tagID = _keys["Architecture"]; break;
-                case 3: tagID = _keys["Biopsychology"]; break;
-                case 4: tagID = _keys["Biotechnology"]; break;
-                case 5: tagID = _keys["Computer Science"]; break;
-                case 6: tagID = _keys["Engineering"]; break;
-                case 7: tagID = _keys["Forestry"]; break;
-                case 8: tagID = _keys["Integrated Sciences"]; break;
-                case 9: tagID = _keys["Kinesiology"]; break;
+                case  1: tagID = _keys["Arts"]; break;
+                case  2: tagID = _keys["Architecture"]; break;
+                case  3: tagID = _keys["Biopsychology"]; break;
+                case  4: tagID = _keys["Biotechnology"]; break;
+                case  5: tagID = _keys["Computer Science"]; break;
+                case  6: tagID = _keys["Engineering"]; break;
+                case  7: tagID = _keys["Forestry"]; break;
+                case  8: tagID = _keys["Integrated Sciences"]; break;
+                case  9: tagID = _keys["Kinesiology"]; break;
                 case 10: tagID = _keys["LFS"]; break;
                 case 11: tagID = _keys["Linguistics"]; break;
                 case 12: tagID = _keys["Math"]; break;
@@ -302,15 +302,15 @@ namespace DiscordBot.Modules
             string customMessage = "";
             switch(program)
             {
-                case 1: customMessage = _messages["Arts"]; break;
-                case 2: customMessage = _messages["Architecture"]; break;
-                case 3: customMessage = _messages["Biopsychology"]; break;
-                case 4: customMessage = _messages["Biotechnology"]; break;
-                case 5: customMessage = _messages["Computer Science"]; break;
-                case 6: customMessage = _messages["Engineering"]; break;
-                case 7: customMessage = _messages["Forestry"]; break;
-                case 8: customMessage = _messages["Integrated Sciences"]; break;
-                case 9: customMessage = _messages["Kinesiology"]; break;
+                case  1: customMessage = _messages["Arts"]; break;
+                case  2: customMessage = _messages["Architecture"]; break;
+                case  3: customMessage = _messages["Biopsychology"]; break;
+                case  4: customMessage = _messages["Biotechnology"]; break;
+                case  5: customMessage = _messages["Computer Science"]; break;
+                case  6: customMessage = _messages["Engineering"]; break;
+                case  7: customMessage = _messages["Forestry"]; break;
+                case  8: customMessage = _messages["Integrated Sciences"]; break;
+                case  9: customMessage = _messages["Kinesiology"]; break;
                 case 10: customMessage = _messages["LFS"]; break;
                 case 11: customMessage = _messages["Linguistics"]; break;
                 case 12: customMessage = _messages["Math"]; break;
